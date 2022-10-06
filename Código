@@ -1,0 +1,222 @@
+Sub Exportar_bk()
+Application.ScreenUpdating = False
+Dim equipo As Range
+Dim descripcion As String
+Dim grupop As Range
+Dim problema As Range
+Dim cause As Range
+Dim qtec As Integer
+Dim nohr As Integer
+Dim tipo As String
+Dim mina As String
+Dim row As Integer
+Dim column As Integer
+Dim typetec As String
+Dim count As Integer
+Dim count1 As Integer
+Dim count2 As Integer
+Dim count3 As Integer
+Dim rowu As Integer
+Dim libro As String
+Dim i As Integer
+Dim ps(14) As String
+Dim qty(14) As String
+Dim a As Integer
+row = 10
+column = 5
+libro = ActiveWorkbook.Name
+rowu = 10
+count1 = 5
+Do While Cells(rowu, 5).Value <> 0
+
+'-------------------------------------
+'DATOS VARIOS
+Set equipo = Cells(row, column)
+'Set descripcion = Cells(row + 8, column + 3)
+'descripcion = descripcion & ", " & Cells(row + 10, column + 3).Text
+descripcion = Cells(row + 8, column + 3).Text & ", " & Cells(row + 10, column + 3).Text & ", " & Cells(row + 55, column + 16).Text
+
+If Cells(row - 2, 12) <> "" Then
+mina = "COMCA"
+Else
+If Cells(row - 2, 21) <> "" Then
+mina = "COMED"
+Else
+mina = ""
+End If
+End If
+
+Set grupop = Cells(row + 16, column + 1)
+Set problema = Cells(row + 16, column + 9)
+Set cause = Cells(row + 16, column + 16)
+On Error GoTo error2
+nohr = Cells(row + 46, column + 17).Value
+'Vector qty
+a = 1
+For i = 1 To 14
+If Cells(row + 23, 7) <> "" And Cells(row + 23, 7) <> "REVISAR PN" Then
+qty(a) = Cells(row + 23, 4).Text
+a = a + 1
+End If
+row = row + 1
+Next
+row = row - 14
+'Vector ps
+a = 1
+For i = 1 To 14
+If Cells(row + 23, 7) <> "" And Cells(row + 23, 7) <> "REVISAR PN" Then
+If Len(Cells(row + 23, 7)) = 6 Then
+ps(a) = "000000000000" & Cells(row + 23, 7).Text
+End If
+If Len(Cells(row + 23, 7)) = 5 Then
+ps(a) = "0000000000000" & Cells(row + 23, 7).Text
+End If
+a = a + 1
+End If
+row = row + 1
+Next
+row = row - 14
+'Técnico
+i = 1
+Do While i <> 8
+If Cells(row + 46, 6).Value <> 0 Then
+typetec = "TECH_MECH"
+qtec = Cells(row + 46, 6).Value
+Exit Do
+End If
+If Cells(row + 48, 6).Value <> 0 Then
+typetec = "ELECTRICIAN"
+qtec = Cells(row + 48, 6).Value
+Exit Do
+End If
+If Cells(row + 50, 6).Value <> 0 Then
+typetec = "WELDER"
+qtec = Cells(row + 50, 6).Value
+Exit Do
+End If
+
+If Cells(row + 52, 6).Value <> 0 Then
+typetec = "MACHINIST"
+qtec = Cells(row + 50, 6).Value
+Exit Do
+End If
+
+
+If Cells(row + 46, 16).Value <> 0 Then
+typetec = "KALTIRE_TECH"
+qtec = Cells(row + 50, 6).Value
+Exit Do
+End If
+
+If Cells(row + 48, 16).Value <> 0 Then
+typetec = "SERVIPARAMO_MECH"
+qtec = Cells(row + 50, 6).Value
+Exit Do
+End If
+
+If Cells(row + 50, 16).Value <> 0 Then
+typetec = "SERVIVIDRIO_MECH"
+qtec = Cells(row + 50, 6).Value
+Exit Do
+End If
+
+If i = 7 Then
+typetec = "TECH_MECH"
+Exit Do
+End If
+i = i + 1
+Loop
+'PM TYPE
+i = 1
+Do While i <> 7
+If Cells(row + 61, 21) <> 0 Then
+tipo = "NPM"
+Exit Do
+End If
+If Cells(row + 63, 21) <> 0 Then
+tipo = "PM4"
+Exit Do
+End If
+If Cells(row + 61, 27) <> 0 Then
+tipo = "PM1"
+Exit Do
+End If
+If Cells(row + 63, 27) <> 0 Then
+tipo = "PM3"
+Exit Do
+End If
+If i = 6 Then
+tipo = "NPM"
+Exit Do
+End If
+i = i + 1
+Loop
+'----------------------------------------------
+On Error GoTo error1
+Workbooks("New WM_WO_CI_backlogs").Activate
+Sheets("Data Input").Select
+count2 = 5
+Do While count3 = 0
+If Cells(count2, 7) = "" Then
+Cells(count2, 1) = mina
+Cells(count2, 2) = "NEXT"
+Cells(count2, 3) = "BK"
+Cells(count2, 4) = "MTRUCKS"
+If Cells(count2, 1) = "COMED" Then
+Cells(count2, 5) = "793_PM_ED"
+Else
+Cells(count2, 5) = "PL_ALTA_PM"
+End If
+Cells(count2, 6) = tipo
+Cells(count2, 7) = descripcion
+Cells(count2, 9) = "M0" & equipo
+Cells(count2, 10) = nohr
+Cells(count2, 17) = grupop
+Cells(count2, 18) = problema
+Cells(count2, 19) = cause
+Cells(count2, 20) = typetec
+Cells(count2, 21) = qtec
+Cells(count2, 22) = nohr
+column = 23
+'vector ps imprimir
+For i = 1 To 14
+Cells(count2, column) = ps(i)
+column = column + 2
+Next
+column = 24
+'´vector qty imprimir
+For i = 1 To 14
+
+If ps(i) <> "" Then
+Cells(count2, column) = qty(i)
+column = column + 2
+Else
+Cells(count2, column) = ""
+column = column + 2
+End If
+Next
+count3 = 1
+Else
+count2 = count2 + 1
+End If
+Loop
+Erase qty
+Erase ps
+count3 = 0
+Workbooks(libro).Activate
+column = column - 47
+count1 = count1 + 1
+rowu = rowu + 86
+row = row + 86
+Loop
+Application.ScreenUpdating = True
+On Error GoTo error1
+Workbooks("New WM_WO_CI_backlogs").Activate
+
+Exit Sub
+error1:
+MsgBox "Por favor abra la CI con nombre 'New WM_WO_CI_backlogs', en caso de que la tenga abierta, verifique que el nombre sea exactamente el indicado"
+Exit Sub
+error2:
+MsgBox "Por favor verifique que todos los BK tengan horas técnico y horas de labor"
+End Sub
